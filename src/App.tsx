@@ -1,0 +1,47 @@
+import { Routes, Route, Navigate } from 'react-router-dom'
+import { AppShell } from './components/layout/AppShell'
+import LoginPage from './pages/auth/LoginPage'
+import AuthCallbackPage from './pages/auth/AuthCallbackPage'
+import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
+import ClientDossierPage from './pages/client/ClientDossierPage'
+import ClientDocumentsPage from './pages/client/ClientDocumentsPage'
+import ClientMessagesPage from './pages/client/ClientMessagesPage'
+import ClientProfilPage from './pages/client/ClientProfilPage'
+import ExpertDashboardPage from './pages/expert/ExpertDashboardPage'
+import ExpertDossierPage from './pages/expert/ExpertDossierPage'
+import ExpertRapportPage from './pages/expert/ExpertRapportPage'
+import ExpertDossiersPage from './pages/expert/ExpertDossiersPage'
+import ExpertAgendaPage from './pages/expert/ExpertAgendaPage'
+
+export default function App() {
+  return (
+    <Routes>
+      {/* Pages publiques */}
+      <Route path="/login" element={<LoginPage />} />
+      <Route path="/auth/callback" element={<AuthCallbackPage />} />
+      <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+
+      {/* Espace Client — protégé */}
+      <Route element={<AppShell requiredRole="client" />}>
+        <Route path="/client" element={<Navigate to="/client/dossier" replace />} />
+        <Route path="/client/dossier" element={<ClientDossierPage />} />
+        <Route path="/client/dossier/:ref" element={<ClientDossierPage />} />
+        <Route path="/client/dossier/:ref/documents" element={<ClientDocumentsPage />} />
+        <Route path="/client/dossier/:ref/messages" element={<ClientMessagesPage />} />
+        <Route path="/client/profil" element={<ClientProfilPage />} />
+      </Route>
+
+      {/* Espace Expert — protégé */}
+      <Route element={<AppShell requiredRole="expert" />}>
+        <Route path="/expert" element={<ExpertDashboardPage />} />
+        <Route path="/expert/dossiers" element={<ExpertDossiersPage />} />
+        <Route path="/expert/dossier/:ref" element={<ExpertDossierPage />} />
+        <Route path="/expert/dossier/:ref/rapport" element={<ExpertRapportPage />} />
+        <Route path="/expert/agenda" element={<ExpertAgendaPage />} />
+      </Route>
+
+      {/* Défaut */}
+      <Route path="*" element={<Navigate to="/login" replace />} />
+    </Routes>
+  )
+}
