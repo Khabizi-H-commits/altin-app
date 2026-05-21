@@ -51,6 +51,9 @@ export function ClientNav() {
       {/* Header mobile */}
       <header className="bg-paper border-b border-paper-2 px-4 py-3 flex items-center justify-between sticky top-0 z-10">
         <div className="flex items-center gap-2">
+          <a href="https://altin-expertises.fr" className="text-xs text-muted hover:text-ink flex items-center gap-1 mr-1">
+            ← Site
+          </a>
           <img src="/logo.png" alt="ALT'IN" className="h-7 w-7 object-contain" />
           <span className="font-bold text-base text-primary tracking-tight">
             ALT'IN<span className="text-accent">.</span>

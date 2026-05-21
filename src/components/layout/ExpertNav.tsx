@@ -17,6 +17,9 @@ export function ExpertNav() {
     <nav className="bg-paper border-b border-paper-2 px-6 py-3 flex items-center justify-between sticky top-0 z-10">
       <div className="flex items-center gap-6">
         <div className="flex items-center gap-2">
+          <a href="https://altin-expertises.fr" className="text-xs text-muted hover:text-ink flex items-center gap-1 mr-2">
+            ← Site
+          </a>
           <img src="/logo.png" alt="ALT'IN" className="h-8 w-8 object-contain" />
           <span className="font-bold text-lg text-primary tracking-tight">
             ALT'IN<span className="text-accent">.</span>
