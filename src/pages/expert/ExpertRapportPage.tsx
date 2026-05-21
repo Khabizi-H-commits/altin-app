@@ -3,19 +3,17 @@ import { useParams, Link } from 'react-router-dom'
 import { ExpertNav } from '@/components/layout/ExpertNav'
 import { Button } from '@/components/ui/Button'
 import { fetchDossierByRef } from '@/stores/dossierStore'
-import type { Dossier } from '@/types'
 
 const CHAPTERS = ['Contexte', 'Désordres constatés', 'Analyse des causes', 'Évaluation', 'Conclusions']
 
 export default function ExpertRapportPage() {
   const { ref } = useParams<{ ref: string }>()
-  const [dossier, setDossier] = useState<Dossier | null>(null)
   const [chapter, setChapter] = useState(0)
   const [content, setContent] = useState<Record<number, string>>({})
   const [saved, setSaved] = useState(false)
 
   useEffect(() => {
-    if (ref) fetchDossierByRef(ref).then(setDossier)
+    if (ref) fetchDossierByRef(ref)
     // Charger brouillon depuis localStorage
     const draft = localStorage.getItem(`rapport-${ref}`)
     if (draft) setContent(JSON.parse(draft))
