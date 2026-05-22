@@ -28,6 +28,7 @@ export function ExpertNav() {
         <NavLink to="/expert" end className={linkClass}>Aujourd'hui</NavLink>
         <NavLink to="/expert/dossiers" className={linkClass}>Dossiers</NavLink>
         <NavLink to="/expert/agenda" className={linkClass}>Agenda</NavLink>
+        <NavLink to="/expert/formations" className={linkClass}>Formations</NavLink>
       </div>
       <div className="flex items-center gap-4">
         <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">

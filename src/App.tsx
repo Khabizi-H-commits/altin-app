@@ -12,12 +12,15 @@ import ExpertDossierPage from './pages/expert/ExpertDossierPage'
 import ExpertRapportPage from './pages/expert/ExpertRapportPage'
 import ExpertDossiersPage from './pages/expert/ExpertDossiersPage'
 import ExpertAgendaPage from './pages/expert/ExpertAgendaPage'
+import ExpertFormationsPage from './pages/expert/ExpertFormationsPage'
+import FormationsPage from './pages/public/FormationsPage'
 
 export default function App() {
   return (
     <Routes>
       {/* Pages publiques */}
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/formations" element={<FormationsPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
       <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
 
@@ -38,6 +41,7 @@ export default function App() {
         <Route path="/expert/dossier/:ref" element={<ExpertDossierPage />} />
         <Route path="/expert/dossier/:ref/rapport" element={<ExpertRapportPage />} />
         <Route path="/expert/agenda" element={<ExpertAgendaPage />} />
+        <Route path="/expert/formations" element={<ExpertFormationsPage />} />
       </Route>
 
       {/* Défaut */}
