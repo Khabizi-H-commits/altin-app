@@ -158,7 +158,7 @@ export default function ClientDossierPage() {
                     step.status === 'done' ? 'text-green-600' : 'text-muted'
                   }`}>
                     {STEP_LABELS[step.step_num]}
-                    {step.status === 'in_progress' && <span className="ml-2 text-xs font-normal">● En cours</span>}
+                    {step.status === 'in_progress' && step.step_num < 6 && <span className="ml-2 text-xs font-normal">● En cours</span>}
                     {step.status === 'done' && <span className="ml-2 text-xs font-normal text-muted">
                       {step.validated_at ? new Date(step.validated_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) : ''}
                     </span>}

@@ -98,8 +98,7 @@ export default function ExpertDossierPage() {
       await supabase.from('dossiers')
         .update({
           current_step: nextStepNum,
-          progress: Math.round((nextStepNum - 1) / 6 * 100),
-          ...(nextStepNum === 6 ? {} : {}),
+          progress: (nextStepNum - 1) / 6,
         })
         .eq('id', dossier.id)
     }
@@ -107,7 +106,7 @@ export default function ExpertDossierPage() {
     // Si on vient de valider l'étape 6 → dossier terminé
     if (currentStep.step_num === 6) {
       await supabase.from('dossiers')
-        .update({ status: 'closed', progress: 100, closed_at: new Date().toISOString() })
+        .update({ status: 'closed', progress: 1, closed_at: new Date().toISOString() })
         .eq('id', dossier.id)
     }
 

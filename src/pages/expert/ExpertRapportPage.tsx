@@ -45,7 +45,7 @@ export default function ExpertRapportPage() {
         .eq('step_num', 6)
       // Mettre à jour le dossier
       await supabase.from('dossiers')
-        .update({ current_step: 6, progress: Math.round(5 / 6 * 100) })
+        .update({ current_step: 6, progress: 5 / 6 })
         .eq('id', dossier.id)
     }
     setFinalizing(false)
