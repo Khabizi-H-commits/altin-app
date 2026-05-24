@@ -169,6 +169,21 @@ export default function ExpertDossierPage() {
     return `${(bytes / 1024 / 1024).toFixed(1)} Mo`
   }
 
+  const handleReopenDossier = async () => {
+    if (!dossier) return
+    if (!window.confirm('Rouvrir ce dossier ? Il repassera en statut Actif.')) return
+    // Remettre step 6 en in_progress
+    await supabase.from('dossier_steps')
+      .update({ status: 'in_progress', validated_at: null })
+      .eq('dossier_id', dossier.id)
+      .eq('step_num', 6)
+    // Rouvrir le dossier
+    await supabase.from('dossiers')
+      .update({ status: 'active', current_step: 6, progress: 5 / 6, closed_at: null })
+      .eq('id', dossier.id)
+    await load()
+  }
+
   const handleSaveEstimate = async () => {
     if (!dossier) return
     setSavingEstimate(true)
@@ -329,6 +344,20 @@ export default function ExpertDossierPage() {
           )}
           {!currentStep && dossier.status === 'active' && (
             <p className="text-sm text-green-600 font-medium mt-4">✓ Toutes les étapes sont validées — dossier terminé</p>
+          )}
+          {dossier.status === 'closed' && (
+            <div className="mt-6 p-4 bg-paper-2 border border-paper-2 rounded-sm flex items-center justify-between">
+              <div>
+                <p className="text-sm font-medium text-ink">Dossier clôturé</p>
+                <p className="text-xs text-muted mt-0.5">Rouvrir si un complément est demandé par l'assureur.</p>
+              </div>
+              <button
+                onClick={handleReopenDossier}
+                className="px-4 py-2 text-sm font-semibold text-primary border border-primary/30 rounded-sm hover:bg-primary/5 transition-colors"
+              >
+                🔓 Rouvrir le dossier
+              </button>
+            </div>
           )}
         </div>
 
