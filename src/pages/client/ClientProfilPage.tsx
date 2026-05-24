@@ -72,6 +72,12 @@ export default function ClientProfilPage() {
         <div className="bg-paper rounded-lg border border-paper-2 p-5 mb-4">
           <h2 className="font-semibold text-ink mb-2 text-sm">Notifications</h2>
           <Toggle
+            value={notifEmail ?? true}
+            onChange={setNotifEmail}
+            label="Notifications par email"
+            description="Recevez un email à chaque avancement de votre dossier"
+          />
+          <Toggle
             value={notifPush}
             onChange={setNotifPush}
             label="Notifications dans l'application"
