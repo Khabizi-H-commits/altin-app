@@ -25,6 +25,10 @@ export default function ExpertDossierPage() {
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [deletingDocId, setDeletingDocId] = useState<string | null>(null)
+  const [estimateLow, setEstimateLow] = useState<string>('')
+  const [estimateHigh, setEstimateHigh] = useState<string>('')
+  const [savingEstimate, setSavingEstimate] = useState(false)
+  const [estimateSaved, setEstimateSaved] = useState(false)
 
   const loadDocuments = async (dossierId: string) => {
     const { data } = await supabase
@@ -49,6 +53,8 @@ export default function ExpertDossierPage() {
       setSteps(s)
       setMessages(m as any)
       setActivity(a as any)
+      setEstimateLow(d.estimate_low?.toString() ?? '')
+      setEstimateHigh(d.estimate_high?.toString() ?? '')
       await loadDocuments(d.id)
     }
     setLoading(false)
@@ -164,6 +170,18 @@ export default function ExpertDossierPage() {
     return `${(bytes / 1024 / 1024).toFixed(1)} Mo`
   }
 
+  const handleSaveEstimate = async () => {
+    if (!dossier) return
+    setSavingEstimate(true)
+    await supabase.from('dossiers').update({
+      estimate_low: estimateLow ? parseFloat(estimateLow) : null,
+      estimate_high: estimateHigh ? parseFloat(estimateHigh) : null,
+    }).eq('id', dossier.id)
+    setSavingEstimate(false)
+    setEstimateSaved(true)
+    setTimeout(() => setEstimateSaved(false), 2000)
+  }
+
   const handleSendMessage = async () => {
     if (!newMsg.trim() || !dossier || !profile) return
     setSendingMsg(true)
@@ -227,11 +245,40 @@ export default function ExpertDossierPage() {
                 <p className="text-sm font-medium text-ink mb-1">👤 {dossier.client_name}</p>
               )}
               <p className="text-sm text-muted mb-4">{dossier.address ?? 'Adresse non renseignée'}</p>
-              {dossier.estimate_low && (
-                <p className="text-sm text-ink">
-                  Estimation : <span className="font-semibold">{dossier.estimate_low.toLocaleString('fr-FR')} – {dossier.estimate_high?.toLocaleString('fr-FR')} €</span>
-                </p>
-              )}
+              <div className="mt-3 pt-3 border-t border-paper-2">
+                <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-2">Estimation d'indemnisation</p>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs text-muted">Min</span>
+                    <input
+                      type="number"
+                      value={estimateLow}
+                      onChange={e => setEstimateLow(e.target.value)}
+                      placeholder="ex. 4200"
+                      className="w-28 px-2 py-1 text-sm border border-paper-2 rounded-sm focus:outline-none focus:border-primary bg-paper-2"
+                    />
+                    <span className="text-xs text-muted">€</span>
+                  </div>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-xs text-muted">Max</span>
+                    <input
+                      type="number"
+                      value={estimateHigh}
+                      onChange={e => setEstimateHigh(e.target.value)}
+                      placeholder="ex. 5800"
+                      className="w-28 px-2 py-1 text-sm border border-paper-2 rounded-sm focus:outline-none focus:border-primary bg-paper-2"
+                    />
+                    <span className="text-xs text-muted">€</span>
+                  </div>
+                  <button
+                    onClick={handleSaveEstimate}
+                    disabled={savingEstimate}
+                    className="px-3 py-1 text-xs font-semibold bg-primary text-white rounded-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+                  >
+                    {estimateSaved ? '✓ Sauvegardé' : savingEstimate ? '…' : 'Enregistrer'}
+                  </button>
+                </div>
+              </div>
             </div>
             <div className="flex gap-2">
               <Link to={`/expert/dossier/${dossier.ref}/rapport`}>

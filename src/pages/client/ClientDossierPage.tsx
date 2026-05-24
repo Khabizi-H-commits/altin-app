@@ -198,6 +198,25 @@ export default function ClientDossierPage() {
           </div>
         )}
 
+        {/* Estimation d'indemnisation */}
+        {dossier.estimate_low && (
+          <div className="bg-paper rounded-lg border border-paper-2 p-5 mb-4">
+            <h2 className="font-semibold text-ink mb-3 text-sm">Estimation d'indemnisation</h2>
+            <div className="flex items-baseline gap-2">
+              <span className="text-2xl font-bold text-primary">
+                {dossier.estimate_low.toLocaleString('fr-FR')} €
+              </span>
+              <span className="text-muted text-sm">–</span>
+              <span className="text-2xl font-bold text-primary">
+                {dossier.estimate_high?.toLocaleString('fr-FR')} €
+              </span>
+            </div>
+            <p className="text-xs text-muted mt-2">
+              Fourchette estimée par votre expert. Ce montant peut varier selon les conclusions finales de l'assureur.
+            </p>
+          </div>
+        )}
+
         {/* Contact expert */}
         <div className="bg-paper rounded-lg border border-paper-2 p-5">
           <h2 className="font-semibold text-ink mb-3 text-sm">Votre expert</h2>
