@@ -8,8 +8,10 @@ import { STEP_LABELS, type Dossier, type DossierStep, type Activity } from '@/ty
 const STEP_DESC: Record<number, string> = {
   1: 'Votre demande a été reçue. Notre expert vous contactera sous 48h.',
   2: 'L\'expert se déplace sur place pour constater les dégâts.',
-  3: 'Le rapport d\'expertise est en cours de rédaction.',
+  3: 'Analyse approfondie et chiffrage des dommages en cours.',
   4: 'Votre dossier est en cours de finalisation.',
+  5: 'Le rapport d\'expertise est en cours de rédaction.',
+  6: 'Votre dossier est terminé. Merci de votre confiance.',
 }
 
 export default function ClientDossierPage() {
@@ -32,7 +34,7 @@ export default function ClientDossierPage() {
           .from('dossiers')
           .select('ref')
           .eq('client_id', profile.id)
-          .eq('status', 'active')
+          .in('status', ['active', 'closed'])
           .order('opened_at', { ascending: false })
           .limit(1)
           .single()
