@@ -1,16 +1,19 @@
 import { useEffect, useState } from 'react'
-import { useParams, Link } from 'react-router-dom'
+import { useParams, Link, useNavigate } from 'react-router-dom'
 import { ExpertNav } from '@/components/layout/ExpertNav'
 import { Button } from '@/components/ui/Button'
 import { fetchDossierByRef } from '@/stores/dossierStore'
+import { supabase } from '@/lib/supabase'
 
 const CHAPTERS = ['Contexte', 'Désordres constatés', 'Analyse des causes', 'Évaluation', 'Conclusions']
 
 export default function ExpertRapportPage() {
   const { ref } = useParams<{ ref: string }>()
+  const navigate = useNavigate()
   const [chapter, setChapter] = useState(0)
   const [content, setContent] = useState<Record<number, string>>({})
   const [saved, setSaved] = useState(false)
+  const [finalizing, setFinalizing] = useState(false)
 
   useEffect(() => {
     if (ref) fetchDossierByRef(ref)
@@ -23,6 +26,30 @@ export default function ExpertRapportPage() {
     localStorage.setItem(`rapport-${ref}`, JSON.stringify(content))
     setSaved(true)
     setTimeout(() => setSaved(false), 2000)
+  }
+
+  const handleFinaliser = async () => {
+    setFinalizing(true)
+    handleSave()
+    const dossier = await fetchDossierByRef(ref!)
+    if (dossier) {
+      // Marquer étape 5 comme terminée
+      await supabase.from('dossier_steps')
+        .update({ status: 'done', validated_at: new Date().toISOString() })
+        .eq('dossier_id', dossier.id)
+        .eq('step_num', 5)
+      // Activer étape 6
+      await supabase.from('dossier_steps')
+        .update({ status: 'in_progress' })
+        .eq('dossier_id', dossier.id)
+        .eq('step_num', 6)
+      // Mettre à jour le dossier
+      await supabase.from('dossiers')
+        .update({ current_step: 6, progress: Math.round(5 / 6 * 100) })
+        .eq('id', dossier.id)
+    }
+    setFinalizing(false)
+    navigate(`/expert/dossier/${ref}`)
   }
 
   return (
@@ -89,8 +116,8 @@ export default function ExpertRapportPage() {
                   Suivant →
                 </Button>
               ) : (
-                <Button variant="accent" size="sm" onClick={handleSave}>
-                  ✓ Finaliser le rapport
+                <Button variant="accent" size="sm" onClick={handleFinaliser} disabled={finalizing}>
+                  {finalizing ? 'Finalisation...' : '✓ Finaliser le rapport'}
                 </Button>
               )}
             </div>

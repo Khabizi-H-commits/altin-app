@@ -282,7 +282,7 @@ export default function ExpertDossierPage() {
             </div>
           )}
           {!currentStep && dossier.status === 'active' && (
-            <p className="text-sm text-green-600 font-medium mt-4">✓ Toutes les étapes sont validées</p>
+            <p className="text-sm text-green-600 font-medium mt-4">✓ Toutes les étapes sont validées — dossier terminé</p>
           )}
         </div>
 
