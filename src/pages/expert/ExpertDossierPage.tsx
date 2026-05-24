@@ -80,54 +80,19 @@ export default function ExpertDossierPage() {
     if (!currentStep || !dossier) return
     setValidating(true)
 
-    // Marquer l'étape actuelle comme terminée
+    // Marquer l'étape comme terminée
+    // Le trigger on_step_validated gère automatiquement :
+    // progression du dossier, activation de l'étape suivante,
+    // log d'activité et notification email au client
     await supabase.from('dossier_steps')
       .update({ status: 'done', validated_at: new Date().toISOString() })
       .eq('id', currentStep.id)
 
-    const nextStepNum = currentStep.step_num + 1
-
-    if (nextStepNum <= 6) {
-      // Activer l'étape suivante
-      await supabase.from('dossier_steps')
-        .update({ status: 'in_progress' })
-        .eq('dossier_id', dossier.id)
-        .eq('step_num', nextStepNum)
-
-      // Mettre à jour current_step et progress sur le dossier
-      await supabase.from('dossiers')
-        .update({
-          current_step: nextStepNum,
-          progress: (nextStepNum - 1) / 6,
-        })
-        .eq('id', dossier.id)
-    }
-
-    // Si on vient de valider l'étape 6 → dossier terminé
+    // Si étape 6 → clôturer le dossier
     if (currentStep.step_num === 6) {
       await supabase.from('dossiers')
         .update({ status: 'closed', progress: 1, closed_at: new Date().toISOString() })
         .eq('id', dossier.id)
-    }
-
-    // Notifier le client par email
-    if (dossier.client_id) {
-      const stepMessages: Record<number, string> = {
-        1: "Votre expert a pris en charge votre dossier.",
-        2: "La visite d'expertise sur votre bien a été effectuée.",
-        3: "L'analyse de votre sinistre est terminée.",
-        4: "Le suivi de votre dossier est finalisé.",
-        5: "Votre rapport d'expertise est prêt.",
-        6: "Votre dossier est maintenant clôturé. Merci de votre confiance.",
-      }
-      await supabase.from('notifications').insert({
-        user_id: dossier.client_id,
-        dossier_id: dossier.id,
-        title: `Dossier ${dossier.ref} — étape "${STEP_LABELS[currentStep.step_num]}" validée`,
-        body: stepMessages[currentStep.step_num],
-        link: `/client/dossier/${dossier.ref}`,
-        icon: '✅',
-      })
     }
 
     await load()
