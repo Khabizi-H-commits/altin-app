@@ -154,6 +154,35 @@ export default function ExpertDossierPage() {
     return `${(bytes / 1024 / 1024).toFixed(1)} Mo`
   }
 
+  const handleReactivateStep = async (stepNum: number) => {
+    if (!dossier) return
+    if (!window.confirm(`Revenir à l'étape ${stepNum} — ${STEP_LABELS[stepNum]} ? Les étapes suivantes repasse en attente.`)) return
+
+    // Remettre toutes les étapes >= stepNum en pending, sauf stepNum qui passe in_progress
+    for (const step of steps) {
+      if (step.step_num === stepNum) {
+        await supabase.from('dossier_steps')
+          .update({ status: 'in_progress', validated_at: null })
+          .eq('id', step.id)
+      } else if (step.step_num > stepNum) {
+        await supabase.from('dossier_steps')
+          .update({ status: 'pending', validated_at: null })
+          .eq('id', step.id)
+      }
+    }
+
+    // Mettre à jour le dossier
+    await supabase.from('dossiers')
+      .update({
+        current_step: stepNum,
+        progress: (stepNum - 1) / 6,
+        status: 'active',
+      })
+      .eq('id', dossier.id)
+
+    await load()
+  }
+
   const handleReopenDossier = async () => {
     if (!dossier) return
     if (!window.confirm('Rouvrir ce dossier ? Il repassera en statut Actif.')) return
@@ -306,6 +335,15 @@ export default function ExpertDossierPage() {
                     <p className="text-xs text-muted/70">
                       {new Date(step.validated_at).toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' })}
                     </p>
+                  )}
+                  {step.status === 'done' && dossier.status === 'active' && (
+                    <button
+                      onClick={() => handleReactivateStep(step.step_num)}
+                      className="text-xs text-muted/50 hover:text-accent transition-colors mt-0.5"
+                      title="Revenir à cette étape"
+                    >
+                      ↩ Revenir
+                    </button>
                   )}
                 </div>
                 {i < steps.length - 1 && (
