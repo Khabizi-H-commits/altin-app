@@ -222,7 +222,7 @@ export default function ExpertDossiersPage() {
                     </p>
                   </div>
                   <div className="text-right shrink-0">
-                    <p className="text-xs text-muted">Étape {dossier.current_step}/4</p>
+                    <p className="text-xs text-muted">Étape {dossier.current_step}/6</p>
                     <p className="text-xs font-medium text-ink">{STEP_LABELS[dossier.current_step]}</p>
                   </div>
                 </Link>
