@@ -1,7 +1,7 @@
 import { STEP_LABELS } from '@/types'
 
 interface StepRingProps {
-  currentStep: 1 | 2 | 3 | 4
+  currentStep: 1 | 2 | 3 | 4 | 5 | 6
   progress: number
   size?: 'sm' | 'md' | 'lg'
 }
@@ -29,7 +29,7 @@ export function StepRing({ currentStep, progress, size = 'md' }: StepRingProps) 
         </svg>
         <div className="absolute inset-0 flex flex-col items-center justify-center">
           <span className={`font-bold text-primary ${size === 'sm' ? 'text-lg' : 'text-2xl'}`}>{currentStep}</span>
-          <span className="text-xs text-muted">/4</span>
+          <span className="text-xs text-muted">/6</span>
         </div>
       </div>
       <span className="text-xs font-medium text-ink">{STEP_LABELS[currentStep]}</span>

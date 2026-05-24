@@ -73,9 +73,38 @@ export default function ExpertDossierPage() {
   const handleValidateStep = async () => {
     if (!currentStep || !dossier) return
     setValidating(true)
+
+    // Marquer l'étape actuelle comme terminée
     await supabase.from('dossier_steps')
       .update({ status: 'done', validated_at: new Date().toISOString() })
       .eq('id', currentStep.id)
+
+    const nextStepNum = currentStep.step_num + 1
+
+    if (nextStepNum <= 6) {
+      // Activer l'étape suivante
+      await supabase.from('dossier_steps')
+        .update({ status: 'in_progress' })
+        .eq('dossier_id', dossier.id)
+        .eq('step_num', nextStepNum)
+
+      // Mettre à jour current_step et progress sur le dossier
+      await supabase.from('dossiers')
+        .update({
+          current_step: nextStepNum,
+          progress: Math.round((nextStepNum - 1) / 6 * 100),
+          ...(nextStepNum === 6 ? {} : {}),
+        })
+        .eq('id', dossier.id)
+    }
+
+    // Si on vient de valider l'étape 6 → dossier terminé
+    if (currentStep.step_num === 6) {
+      await supabase.from('dossiers')
+        .update({ status: 'closed', progress: 100, closed_at: new Date().toISOString() })
+        .eq('id', dossier.id)
+    }
+
     await load()
     setValidating(false)
   }

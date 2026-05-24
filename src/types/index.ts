@@ -25,7 +25,7 @@ export interface Dossier {
   expert_id: string
   client_name: string | null
   address: string | null
-  current_step: 1 | 2 | 3 | 4
+  current_step: 1 | 2 | 3 | 4 | 5 | 6
   progress: number
   status: DossierStatus
   estimate_low: number | null
@@ -37,7 +37,7 @@ export interface Dossier {
 export interface DossierStep {
   id: string
   dossier_id: string
-  step_num: 1 | 2 | 3 | 4
+  step_num: 1 | 2 | 3 | 4 | 5 | 6
   status: StepStatus
   validated_at: string | null
   notes: string | null
@@ -89,4 +89,6 @@ export const STEP_LABELS: Record<number, string> = {
   2: 'Visite',
   3: 'Analyse',
   4: 'Suivi',
+  5: 'Rapport',
+  6: 'Terminé',
 }
