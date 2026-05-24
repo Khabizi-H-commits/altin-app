@@ -110,6 +110,26 @@ export default function ExpertDossierPage() {
         .eq('id', dossier.id)
     }
 
+    // Notifier le client par email
+    if (dossier.client_id) {
+      const stepMessages: Record<number, string> = {
+        1: "Votre expert a pris en charge votre dossier.",
+        2: "La visite d'expertise sur votre bien a été effectuée.",
+        3: "L'analyse de votre sinistre est terminée.",
+        4: "Le suivi de votre dossier est finalisé.",
+        5: "Votre rapport d'expertise est prêt.",
+        6: "Votre dossier est maintenant clôturé. Merci de votre confiance.",
+      }
+      await supabase.from('notifications').insert({
+        user_id: dossier.client_id,
+        dossier_id: dossier.id,
+        title: `Dossier ${dossier.ref} — étape "${STEP_LABELS[currentStep.step_num]}" validée`,
+        body: stepMessages[currentStep.step_num],
+        link: `/client/dossier/${dossier.ref}`,
+        icon: '✅',
+      })
+    }
+
     await load()
     setValidating(false)
   }
