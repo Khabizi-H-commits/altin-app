@@ -11,8 +11,8 @@ export default {
         muted:   'oklch(0.55 0.015 250)',
       },
       fontFamily: {
-        display: ['Plus Jakarta Sans', 'sans-serif'],
-        body:    ['Plus Jakarta Sans', 'sans-serif'],
+        display: ['Poppins', 'sans-serif'],
+        body:    ['Poppins', 'sans-serif'],
         mono:    ['JetBrains Mono', 'monospace'],
       },
       borderRadius: {
