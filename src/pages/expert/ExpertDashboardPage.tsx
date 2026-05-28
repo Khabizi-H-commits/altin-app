@@ -35,7 +35,7 @@ export default function ExpertDashboardPage() {
         <div className="grid grid-cols-3 gap-4 mb-8">
           {[
             { label: 'Dossiers actifs', value: actifs.length, color: 'text-primary' },
-            { label: 'En cours', value: actifs.filter(d => d.current_step < 4).length, color: 'text-accent' },
+            { label: 'En cours', value: actifs.filter(d => d.current_step < 6).length, color: 'text-accent' },
             { label: 'Terminés', value: dossiers.filter(d => d.status === 'closed').length, color: 'text-green-600' },
           ].map(kpi => (
             <div key={kpi.label} className="bg-paper rounded-md border border-paper-2 p-5">
