@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/Button'
 import { Pill } from '@/components/ui/Pill'
 import { StepRing } from '@/components/ui/StepRing'
 import { supabase } from '@/lib/supabase'
+import { buildStoragePath } from '@/lib/storage'
 import { useAuthStore } from '@/stores/authStore'
 import { fetchDossierByRef, fetchDossierSteps, fetchMessages, fetchActivity } from '@/stores/dossierStore'
 import { STEP_LABELS, type Dossier, type DossierStep, type Message, type Activity, type Document } from '@/types'
@@ -104,7 +105,7 @@ export default function ExpertDossierPage() {
     setUploading(true)
     setUploadError(null)
     for (const file of Array.from(files)) {
-      const path = `${dossier.id}/${Date.now()}-${file.name}`
+      const path = buildStoragePath(dossier.id, file)
       const { error: storageError } = await supabase.storage
         .from('Document')
         .upload(path, file)

@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import { ClientNav } from '@/components/layout/ClientNav'
 import { useAuthStore } from '@/stores/authStore'
 import { supabase } from '@/lib/supabase'
+import { buildStoragePath } from '@/lib/storage'
 import type { Document } from '@/types'
 
 export default function ClientDocumentsPage() {
@@ -35,7 +36,7 @@ export default function ClientDocumentsPage() {
     setUploading(true)
     setUploadError(null)
     for (const file of Array.from(files)) {
-      const path = `${dossierId}/${Date.now()}-${file.name}`
+      const path = buildStoragePath(dossierId, file)
       const { error: se } = await supabase.storage.from('Document').upload(path, file)
       if (se) { setUploadError(`Erreur : ${se.message}`); setUploading(false); return }
       await supabase.from('documents').insert({
