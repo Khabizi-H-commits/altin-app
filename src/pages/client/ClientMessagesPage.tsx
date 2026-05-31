@@ -31,9 +31,9 @@ export default function ClientMessagesPage() {
         .order('created_at')
       setMessages((m ?? []) as MsgWithProfile[])
 
-      // Realtime
+      // Realtime (insert, update, delete)
       const channel = supabase.channel(`client-msgs-${d.id}`)
-        .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `dossier_id=eq.${d.id}` },
+        .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `dossier_id=eq.${d.id}` },
           async () => {
             const { data: fresh } = await supabase
               .from('messages')
@@ -116,7 +116,10 @@ export default function ClientMessagesPage() {
                   }`}>
                     {msg.txt}
                   </div>
-                  <p className="text-xs text-muted px-1">{formatTime(msg.created_at)}</p>
+                  <p className="text-xs text-muted px-1">
+                    {formatTime(msg.created_at)}
+                    {msg.edited_at && <span className="italic ml-1">· modifié</span>}
+                  </p>
                 </div>
               </div>
             </div>

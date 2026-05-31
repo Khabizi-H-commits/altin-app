@@ -23,6 +23,9 @@ export default function ExpertDossierPage() {
   const [tab, setTab] = useState<'etapes' | 'documents' | 'messages' | 'activite'>('etapes')
   const [newMsg, setNewMsg] = useState('')
   const [sendingMsg, setSendingMsg] = useState(false)
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editingTxt, setEditingTxt] = useState('')
+  const [savingEdit, setSavingEdit] = useState(false)
   const [uploading, setUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [deletingDocId, setDeletingDocId] = useState<string | null>(null)
@@ -68,7 +71,7 @@ export default function ExpertDossierPage() {
     if (!dossier?.id) return
     const channel = supabase
       .channel(`messages:${dossier.id}`)
-      .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `dossier_id=eq.${dossier.id}` },
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'messages', filter: `dossier_id=eq.${dossier.id}` },
         () => fetchMessages(dossier.id).then(m => setMessages(m as any))
       )
       .subscribe()
@@ -221,6 +224,32 @@ export default function ExpertDossierPage() {
     })
     setNewMsg('')
     setSendingMsg(false)
+  }
+
+  const handleStartEdit = (msg: Message) => {
+    setEditingId(msg.id)
+    setEditingTxt(msg.txt)
+  }
+
+  const handleCancelEdit = () => {
+    setEditingId(null)
+    setEditingTxt('')
+  }
+
+  const handleSaveEdit = async () => {
+    if (!editingId || !editingTxt.trim()) return
+    setSavingEdit(true)
+    await supabase.from('messages')
+      .update({ txt: editingTxt.trim(), edited_at: new Date().toISOString() })
+      .eq('id', editingId)
+    setEditingId(null)
+    setEditingTxt('')
+    setSavingEdit(false)
+  }
+
+  const handleDeleteMessage = async (id: string) => {
+    if (!confirm('Supprimer ce message ?')) return
+    await supabase.from('messages').delete().eq('id', id)
   }
 
   if (loading) {
@@ -501,13 +530,66 @@ export default function ExpertDossierPage() {
                   )}
                   {messages.map(msg => {
                     const isMe = msg.from_id === profile?.id
+                    const isEditing = editingId === msg.id
                     return (
-                      <div key={msg.id} className={`flex gap-2 ${isMe ? 'flex-row-reverse' : ''}`}>
+                      <div key={msg.id} className={`group flex gap-2 ${isMe ? 'flex-row-reverse' : ''}`}>
                         <div className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${isMe ? 'bg-primary text-white' : 'bg-paper-2 text-ink'}`}>
                           {(msg as any).profiles?.initials ?? '?'}
                         </div>
-                        <div className={`max-w-xs px-3 py-2 rounded-md text-sm ${isMe ? 'bg-primary text-white' : 'bg-paper-2 text-ink'}`}>
-                          {msg.txt}
+                        <div className={`max-w-xs flex flex-col ${isMe ? 'items-end' : 'items-start'} gap-1`}>
+                          {isEditing ? (
+                            <div className="flex flex-col gap-1 w-full">
+                              <textarea
+                                value={editingTxt}
+                                onChange={e => setEditingTxt(e.target.value)}
+                                rows={2}
+                                autoFocus
+                                className="px-3 py-2 rounded-md border border-paper-2 text-sm text-ink bg-paper focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+                              />
+                              <div className="flex gap-2 justify-end">
+                                <button
+                                  onClick={handleCancelEdit}
+                                  className="text-xs text-muted hover:text-ink"
+                                >
+                                  Annuler
+                                </button>
+                                <button
+                                  onClick={handleSaveEdit}
+                                  disabled={savingEdit || !editingTxt.trim()}
+                                  className="text-xs font-semibold text-primary hover:underline disabled:opacity-50"
+                                >
+                                  {savingEdit ? '…' : 'Enregistrer'}
+                                </button>
+                              </div>
+                            </div>
+                          ) : (
+                            <>
+                              <div className={`px-3 py-2 rounded-md text-sm whitespace-pre-wrap break-words ${isMe ? 'bg-primary text-white' : 'bg-paper-2 text-ink'}`}>
+                                {msg.txt}
+                              </div>
+                              <div className="flex items-center gap-2 px-1">
+                                {msg.edited_at && (
+                                  <span className="text-[10px] text-muted italic">modifié</span>
+                                )}
+                                {isMe && (
+                                  <div className="flex gap-2">
+                                    <button
+                                      onClick={() => handleStartEdit(msg)}
+                                      className="text-[10px] text-muted hover:text-primary underline"
+                                    >
+                                      Modifier
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteMessage(msg.id)}
+                                      className="text-[10px] text-muted hover:text-red-600 underline"
+                                    >
+                                      Supprimer
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </>
+                          )}
                         </div>
                       </div>
                     )

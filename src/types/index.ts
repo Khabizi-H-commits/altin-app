@@ -49,6 +49,7 @@ export interface Message {
   from_id: string
   txt: string
   read_at: string | null
+  edited_at: string | null
   created_at: string
 }
 
