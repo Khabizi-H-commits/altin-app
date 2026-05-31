@@ -61,6 +61,7 @@ export interface Document {
   type: string | null
   size_bytes: number | null
   uploaded_by: string
+  is_report: boolean
   created_at: string
 }
 
