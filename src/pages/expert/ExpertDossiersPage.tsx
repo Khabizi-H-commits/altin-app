@@ -14,14 +14,14 @@ const STATUS_LABELS: Record<DossierStatus, string> = {
 }
 
 type FormState = {
-  ref: string; type: string; address: string; clientName: string; clientEmail: string
+  ref: string; type: string; address: string; clientName: string; clientEmail: string; clientPhone: string
   insurerCompany: string; insurerContractNumber: string; insurerClaimNumber: string
   insurerPhone: string; insurerEmail: string; insurerAddress: string
   insuranceExpertName: string; insuranceExpertFirm: string
   insuranceExpertPhone: string; insuranceExpertEmail: string; insuranceExpertAddress: string
 }
 const emptyForm: FormState = {
-  ref: '', type: '', address: '', clientName: '', clientEmail: '',
+  ref: '', type: '', address: '', clientName: '', clientEmail: '', clientPhone: '',
   insurerCompany: '', insurerContractNumber: '', insurerClaimNumber: '',
   insurerPhone: '', insurerEmail: '', insurerAddress: '',
   insuranceExpertName: '', insuranceExpertFirm: '',
@@ -68,6 +68,7 @@ export default function ExpertDossiersPage() {
       address: dossier.address ?? '',
       clientName: dossier.client_name ?? '',
       clientEmail: '',
+      clientPhone: dossier.client_phone ?? '',
       insurerCompany: dossier.insurer_company ?? '',
       insurerContractNumber: dossier.insurer_contract_number ?? '',
       insurerClaimNumber: dossier.insurer_claim_number ?? '',
@@ -113,6 +114,7 @@ export default function ExpertDossiersPage() {
           type: form.type,
           address: form.address || null,
           client_name: form.clientName,
+          client_phone: form.clientPhone || null,
           ...insuranceFields,
         })
         .eq('id', editingDossier.id)
@@ -134,6 +136,7 @@ export default function ExpertDossiersPage() {
         address: form.address || null,
         client_name: form.clientName,
         client_email: form.clientEmail.toLowerCase().trim(),
+        client_phone: form.clientPhone || null,
         expert_id: profile!.id,
         ...insuranceFields,
       })
@@ -164,6 +167,7 @@ export default function ExpertDossiersPage() {
         { key: 'ref', label: 'Référence dossier', placeholder: 'ALT-2026-001', disabled: !!editingDossier },
         { key: 'type', label: 'Type de sinistre', placeholder: 'Dégât des eaux' },
         { key: 'clientName', label: 'Nom et prénom du client', placeholder: 'Marie Dupont' },
+        { key: 'clientPhone', label: 'Téléphone du client', placeholder: '06 12 34 56 78' },
         ...(!editingDossier ? [{ key: 'clientEmail' as const, label: 'Email client', placeholder: 'client@email.fr' }] : []),
         { key: 'address', label: 'Adresse du bien sinistré', placeholder: '12 rue du Moulin, 34000 Montpellier', fullWidth: true },
       ],
