@@ -30,6 +30,17 @@ export interface Dossier {
   status: DossierStatus
   estimate_low: number | null
   estimate_high: number | null
+  insurer_company: string | null
+  insurer_contract_number: string | null
+  insurer_claim_number: string | null
+  insurer_phone: string | null
+  insurer_email: string | null
+  insurer_address: string | null
+  insurance_expert_name: string | null
+  insurance_expert_firm: string | null
+  insurance_expert_phone: string | null
+  insurance_expert_email: string | null
+  insurance_expert_address: string | null
   opened_at: string
   closed_at: string | null
 }

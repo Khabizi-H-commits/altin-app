@@ -13,8 +13,20 @@ const STATUS_LABELS: Record<DossierStatus, string> = {
   active: 'Actif', closed: 'Clôturé', pending: 'En attente',
 }
 
-type FormState = { ref: string; type: string; address: string; clientName: string; clientEmail: string }
-const emptyForm: FormState = { ref: '', type: '', address: '', clientName: '', clientEmail: '' }
+type FormState = {
+  ref: string; type: string; address: string; clientName: string; clientEmail: string
+  insurerCompany: string; insurerContractNumber: string; insurerClaimNumber: string
+  insurerPhone: string; insurerEmail: string; insurerAddress: string
+  insuranceExpertName: string; insuranceExpertFirm: string
+  insuranceExpertPhone: string; insuranceExpertEmail: string; insuranceExpertAddress: string
+}
+const emptyForm: FormState = {
+  ref: '', type: '', address: '', clientName: '', clientEmail: '',
+  insurerCompany: '', insurerContractNumber: '', insurerClaimNumber: '',
+  insurerPhone: '', insurerEmail: '', insurerAddress: '',
+  insuranceExpertName: '', insuranceExpertFirm: '',
+  insuranceExpertPhone: '', insuranceExpertEmail: '', insuranceExpertAddress: '',
+}
 
 export default function ExpertDossiersPage() {
   const { profile } = useAuthStore()
@@ -56,6 +68,17 @@ export default function ExpertDossiersPage() {
       address: dossier.address ?? '',
       clientName: dossier.client_name ?? '',
       clientEmail: '',
+      insurerCompany: dossier.insurer_company ?? '',
+      insurerContractNumber: dossier.insurer_contract_number ?? '',
+      insurerClaimNumber: dossier.insurer_claim_number ?? '',
+      insurerPhone: dossier.insurer_phone ?? '',
+      insurerEmail: dossier.insurer_email ?? '',
+      insurerAddress: dossier.insurer_address ?? '',
+      insuranceExpertName: dossier.insurance_expert_name ?? '',
+      insuranceExpertFirm: dossier.insurance_expert_firm ?? '',
+      insuranceExpertPhone: dossier.insurance_expert_phone ?? '',
+      insuranceExpertEmail: dossier.insurance_expert_email ?? '',
+      insuranceExpertAddress: dossier.insurance_expert_address ?? '',
     })
     setCreateError(null)
     setShowCreate(true)
@@ -69,6 +92,20 @@ export default function ExpertDossiersPage() {
     setSaving(true)
     setCreateError(null)
 
+    const insuranceFields = {
+      insurer_company: form.insurerCompany || null,
+      insurer_contract_number: form.insurerContractNumber || null,
+      insurer_claim_number: form.insurerClaimNumber || null,
+      insurer_phone: form.insurerPhone || null,
+      insurer_email: form.insurerEmail ? form.insurerEmail.toLowerCase().trim() : null,
+      insurer_address: form.insurerAddress || null,
+      insurance_expert_name: form.insuranceExpertName || null,
+      insurance_expert_firm: form.insuranceExpertFirm || null,
+      insurance_expert_phone: form.insuranceExpertPhone || null,
+      insurance_expert_email: form.insuranceExpertEmail ? form.insuranceExpertEmail.toLowerCase().trim() : null,
+      insurance_expert_address: form.insuranceExpertAddress || null,
+    }
+
     if (editingDossier) {
       // Modification
       const { error } = await supabase.from('dossiers')
@@ -76,6 +113,7 @@ export default function ExpertDossiersPage() {
           type: form.type,
           address: form.address || null,
           client_name: form.clientName,
+          ...insuranceFields,
         })
         .eq('id', editingDossier.id)
 
@@ -97,6 +135,7 @@ export default function ExpertDossiersPage() {
         client_name: form.clientName,
         client_email: form.clientEmail.toLowerCase().trim(),
         expert_id: profile!.id,
+        ...insuranceFields,
       })
 
       setSaving(false)
@@ -117,12 +156,41 @@ export default function ExpertDossiersPage() {
     fetchDossiers(profile!.id)
   }
 
-  const formFields = [
-    { key: 'ref', label: 'Référence dossier', placeholder: 'ALT-2026-001', disabled: !!editingDossier },
-    { key: 'type', label: 'Type de sinistre', placeholder: 'Dégât des eaux' },
-    { key: 'clientName', label: 'Nom et prénom du client', placeholder: 'Marie Dupont' },
-    ...(!editingDossier ? [{ key: 'clientEmail', label: 'Email client', placeholder: 'client@email.fr', disabled: false }] : []),
-    { key: 'address', label: 'Adresse du bien sinistré', placeholder: '12 rue du Moulin, 34000 Montpellier' },
+  type Field = { key: keyof FormState; label: string; placeholder: string; disabled?: boolean; fullWidth?: boolean }
+  const sections: { title: string; hint?: string; fields: Field[] }[] = [
+    {
+      title: 'Dossier & client',
+      fields: [
+        { key: 'ref', label: 'Référence dossier', placeholder: 'ALT-2026-001', disabled: !!editingDossier },
+        { key: 'type', label: 'Type de sinistre', placeholder: 'Dégât des eaux' },
+        { key: 'clientName', label: 'Nom et prénom du client', placeholder: 'Marie Dupont' },
+        ...(!editingDossier ? [{ key: 'clientEmail' as const, label: 'Email client', placeholder: 'client@email.fr' }] : []),
+        { key: 'address', label: 'Adresse du bien sinistré', placeholder: '12 rue du Moulin, 34000 Montpellier', fullWidth: true },
+      ],
+    },
+    {
+      title: 'Assureur',
+      hint: 'Coordonnées de la compagnie d’assurance (optionnel)',
+      fields: [
+        { key: 'insurerCompany', label: 'Compagnie', placeholder: 'MAIF, AXA, Groupama…' },
+        { key: 'insurerContractNumber', label: 'N° de contrat', placeholder: '123456789' },
+        { key: 'insurerClaimNumber', label: 'N° de sinistre', placeholder: 'SIN-2026-…' },
+        { key: 'insurerPhone', label: 'Téléphone', placeholder: '01 23 45 67 89' },
+        { key: 'insurerEmail', label: 'Email', placeholder: 'sinistres@assureur.fr' },
+        { key: 'insurerAddress', label: 'Adresse', placeholder: '1 rue de l’assurance, 75001 Paris', fullWidth: true },
+      ],
+    },
+    {
+      title: "Expert d'assurance",
+      hint: 'Coordonnées de l’expert mandaté par l’assureur (optionnel)',
+      fields: [
+        { key: 'insuranceExpertName', label: 'Nom et prénom', placeholder: 'Jean Martin' },
+        { key: 'insuranceExpertFirm', label: 'Cabinet', placeholder: 'Eurexo, Saretec…' },
+        { key: 'insuranceExpertPhone', label: 'Téléphone', placeholder: '01 23 45 67 89' },
+        { key: 'insuranceExpertEmail', label: 'Email', placeholder: 'expert@cabinet.fr' },
+        { key: 'insuranceExpertAddress', label: 'Adresse', placeholder: '5 avenue des Experts, 75008 Paris', fullWidth: true },
+      ],
+    },
   ]
 
   return (
@@ -142,17 +210,27 @@ export default function ExpertDossiersPage() {
             <h2 className="font-semibold text-ink mb-4">
               {editingDossier ? `Modifier ${editingDossier.ref}` : 'Nouveau dossier'}
             </h2>
-            <div className="grid grid-cols-2 gap-4">
-              {formFields.map(field => (
-                <div key={field.key}>
-                  <label className="block text-xs font-medium text-ink mb-1">{field.label}</label>
-                  <input
-                    value={form[field.key as keyof FormState]}
-                    onChange={e => setForm(f => ({ ...f, [field.key]: e.target.value }))}
-                    placeholder={field.placeholder}
-                    disabled={'disabled' in field && field.disabled}
-                    className="w-full px-3 py-2 rounded-sm border border-paper-2 text-sm bg-paper focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
-                  />
+            <div className="space-y-6">
+              {sections.map(section => (
+                <div key={section.title}>
+                  <div className="flex items-baseline justify-between mb-2 pb-1 border-b border-paper-2">
+                    <h3 className="text-sm font-semibold text-ink">{section.title}</h3>
+                    {section.hint && <p className="text-xs text-muted">{section.hint}</p>}
+                  </div>
+                  <div className="grid grid-cols-2 gap-4">
+                    {section.fields.map(field => (
+                      <div key={field.key} className={field.fullWidth ? 'col-span-2' : ''}>
+                        <label className="block text-xs font-medium text-ink mb-1">{field.label}</label>
+                        <input
+                          value={form[field.key]}
+                          onChange={e => setForm(f => ({ ...f, [field.key]: e.target.value }))}
+                          placeholder={field.placeholder}
+                          disabled={field.disabled}
+                          className="w-full px-3 py-2 rounded-sm border border-paper-2 text-sm bg-paper focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary disabled:opacity-50 disabled:cursor-not-allowed"
+                        />
+                      </div>
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>
