@@ -2,6 +2,7 @@
 -- À coller dans Supabase SQL Editor (projet wxugogsgrlxrrktcewtz)
 
 alter table public.dossiers
+  add column if not exists client_phone text,
   add column if not exists insurer_company text,
   add column if not exists insurer_contract_number text,
   add column if not exists insurer_claim_number text,

@@ -24,6 +24,7 @@ export interface Dossier {
   client_email: string | null
   expert_id: string
   client_name: string | null
+  client_phone: string | null
   address: string | null
   current_step: 1 | 2 | 3 | 4 | 5 | 6
   progress: number

@@ -34,6 +34,27 @@ export default function ExpertDossierPage() {
   const [savingEstimate, setSavingEstimate] = useState(false)
   const [estimateSaved, setEstimateSaved] = useState(false)
 
+  // Coordonnées client
+  const [clientPhone, setClientPhone] = useState<string>('')
+
+  // Coordonnées assureur
+  const [insurerCompany, setInsurerCompany] = useState<string>('')
+  const [insurerContractNumber, setInsurerContractNumber] = useState<string>('')
+  const [insurerClaimNumber, setInsurerClaimNumber] = useState<string>('')
+  const [insurerPhone, setInsurerPhone] = useState<string>('')
+  const [insurerEmail, setInsurerEmail] = useState<string>('')
+  const [insurerAddress, setInsurerAddress] = useState<string>('')
+
+  // Coordonnées expert d'assurance adverse
+  const [insuranceExpertName, setInsuranceExpertName] = useState<string>('')
+  const [insuranceExpertFirm, setInsuranceExpertFirm] = useState<string>('')
+  const [insuranceExpertPhone, setInsuranceExpertPhone] = useState<string>('')
+  const [insuranceExpertEmail, setInsuranceExpertEmail] = useState<string>('')
+  const [insuranceExpertAddress, setInsuranceExpertAddress] = useState<string>('')
+
+  const [savingInsurance, setSavingInsurance] = useState(false)
+  const [insuranceSaved, setInsuranceSaved] = useState(false)
+
   const loadDocuments = async (dossierId: string) => {
     const { data } = await supabase
       .from('documents')
@@ -59,6 +80,18 @@ export default function ExpertDossierPage() {
       setActivity(a as any)
       setEstimateLow(d.estimate_low?.toString() ?? '')
       setEstimateHigh(d.estimate_high?.toString() ?? '')
+      setClientPhone(d.client_phone ?? '')
+      setInsurerCompany(d.insurer_company ?? '')
+      setInsurerContractNumber(d.insurer_contract_number ?? '')
+      setInsurerClaimNumber(d.insurer_claim_number ?? '')
+      setInsurerPhone(d.insurer_phone ?? '')
+      setInsurerEmail(d.insurer_email ?? '')
+      setInsurerAddress(d.insurer_address ?? '')
+      setInsuranceExpertName(d.insurance_expert_name ?? '')
+      setInsuranceExpertFirm(d.insurance_expert_firm ?? '')
+      setInsuranceExpertPhone(d.insurance_expert_phone ?? '')
+      setInsuranceExpertEmail(d.insurance_expert_email ?? '')
+      setInsuranceExpertAddress(d.insurance_expert_address ?? '')
       await loadDocuments(d.id)
     }
     setLoading(false)
@@ -214,6 +247,28 @@ export default function ExpertDossierPage() {
     setTimeout(() => setEstimateSaved(false), 2000)
   }
 
+  const handleSaveInsurance = async () => {
+    if (!dossier) return
+    setSavingInsurance(true)
+    await supabase.from('dossiers').update({
+      client_phone: clientPhone || null,
+      insurer_company: insurerCompany || null,
+      insurer_contract_number: insurerContractNumber || null,
+      insurer_claim_number: insurerClaimNumber || null,
+      insurer_phone: insurerPhone || null,
+      insurer_email: insurerEmail || null,
+      insurer_address: insurerAddress || null,
+      insurance_expert_name: insuranceExpertName || null,
+      insurance_expert_firm: insuranceExpertFirm || null,
+      insurance_expert_phone: insuranceExpertPhone || null,
+      insurance_expert_email: insuranceExpertEmail || null,
+      insurance_expert_address: insuranceExpertAddress || null,
+    }).eq('id', dossier.id)
+    setSavingInsurance(false)
+    setInsuranceSaved(true)
+    setTimeout(() => setInsuranceSaved(false), 2500)
+  }
+
   const handleSendMessage = async () => {
     if (!newMsg.trim() || !dossier || !profile) return
     setSendingMsg(true)
@@ -342,6 +397,161 @@ export default function ExpertDossierPage() {
               <Link to={`/expert/dossier/${dossier.ref}/rapport`}>
                 <Button variant="ghost" size="sm">Rapport</Button>
               </Link>
+            </div>
+          </div>
+        </div>
+
+        {/* Coordonnées assurance */}
+        <div className="bg-paper rounded-md border border-paper-2 p-6 mb-6">
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="font-semibold text-ink">Coordonnées assurance</h2>
+            <button
+              onClick={handleSaveInsurance}
+              disabled={savingInsurance}
+              className="px-4 py-1.5 text-xs font-semibold bg-primary text-white rounded-sm hover:opacity-90 transition-opacity disabled:opacity-50"
+            >
+              {insuranceSaved ? '✓ Sauvegardé' : savingInsurance ? '…' : 'Enregistrer'}
+            </button>
+          </div>
+
+          {/* Téléphone client */}
+          <div className="mb-6">
+            <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-3">📞 Client</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-muted mb-1 block">Téléphone client</label>
+                <input
+                  type="tel"
+                  value={clientPhone}
+                  onChange={e => setClientPhone(e.target.value)}
+                  placeholder="06 00 00 00 00"
+                  className="w-full px-3 py-2 text-sm border border-paper-2 rounded-sm focus:outline-none focus:border-primary bg-paper-2"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Assureur */}
+          <div className="mb-6">
+            <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-3">🏢 Assureur</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-muted mb-1 block">Compagnie d'assurance</label>
+                <input
+                  type="text"
+                  value={insurerCompany}
+                  onChange={e => setInsurerCompany(e.target.value)}
+                  placeholder="ex. Allianz, AXA, Maif…"
+                  className="w-full px-3 py-2 text-sm border border-paper-2 rounded-sm focus:outline-none focus:border-primary bg-paper-2"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-muted mb-1 block">N° de contrat</label>
+                <input
+                  type="text"
+                  value={insurerContractNumber}
+                  onChange={e => setInsurerContractNumber(e.target.value)}
+                  placeholder="ex. CT-2024-XXXXX"
+                  className="w-full px-3 py-2 text-sm border border-paper-2 rounded-sm focus:outline-none focus:border-primary bg-paper-2"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-muted mb-1 block">N° de sinistre</label>
+                <input
+                  type="text"
+                  value={insurerClaimNumber}
+                  onChange={e => setInsurerClaimNumber(e.target.value)}
+                  placeholder="ex. SIN-2024-XXXXX"
+                  className="w-full px-3 py-2 text-sm border border-paper-2 rounded-sm focus:outline-none focus:border-primary bg-paper-2"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-muted mb-1 block">Téléphone assureur</label>
+                <input
+                  type="tel"
+                  value={insurerPhone}
+                  onChange={e => setInsurerPhone(e.target.value)}
+                  placeholder="ex. 01 23 45 67 89"
+                  className="w-full px-3 py-2 text-sm border border-paper-2 rounded-sm focus:outline-none focus:border-primary bg-paper-2"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-muted mb-1 block">Email assureur</label>
+                <input
+                  type="email"
+                  value={insurerEmail}
+                  onChange={e => setInsurerEmail(e.target.value)}
+                  placeholder="ex. gestionnaire@assureur.fr"
+                  className="w-full px-3 py-2 text-sm border border-paper-2 rounded-sm focus:outline-none focus:border-primary bg-paper-2"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-muted mb-1 block">Adresse assureur</label>
+                <input
+                  type="text"
+                  value={insurerAddress}
+                  onChange={e => setInsurerAddress(e.target.value)}
+                  placeholder="ex. 12 rue de la Paix, 75001 Paris"
+                  className="w-full px-3 py-2 text-sm border border-paper-2 rounded-sm focus:outline-none focus:border-primary bg-paper-2"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Expert d'assurance adverse */}
+          <div>
+            <p className="text-xs font-semibold text-muted uppercase tracking-wide mb-3">🔍 Expert d'assurance adverse</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label className="text-xs text-muted mb-1 block">Nom de l'expert</label>
+                <input
+                  type="text"
+                  value={insuranceExpertName}
+                  onChange={e => setInsuranceExpertName(e.target.value)}
+                  placeholder="ex. Jean Dupont"
+                  className="w-full px-3 py-2 text-sm border border-paper-2 rounded-sm focus:outline-none focus:border-primary bg-paper-2"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-muted mb-1 block">Cabinet</label>
+                <input
+                  type="text"
+                  value={insuranceExpertFirm}
+                  onChange={e => setInsuranceExpertFirm(e.target.value)}
+                  placeholder="ex. Cabinet Expertise Sud"
+                  className="w-full px-3 py-2 text-sm border border-paper-2 rounded-sm focus:outline-none focus:border-primary bg-paper-2"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-muted mb-1 block">Téléphone expert adverse</label>
+                <input
+                  type="tel"
+                  value={insuranceExpertPhone}
+                  onChange={e => setInsuranceExpertPhone(e.target.value)}
+                  placeholder="ex. 06 00 00 00 00"
+                  className="w-full px-3 py-2 text-sm border border-paper-2 rounded-sm focus:outline-none focus:border-primary bg-paper-2"
+                />
+              </div>
+              <div>
+                <label className="text-xs text-muted mb-1 block">Email expert adverse</label>
+                <input
+                  type="email"
+                  value={insuranceExpertEmail}
+                  onChange={e => setInsuranceExpertEmail(e.target.value)}
+                  placeholder="ex. expert@cabinet.fr"
+                  className="w-full px-3 py-2 text-sm border border-paper-2 rounded-sm focus:outline-none focus:border-primary bg-paper-2"
+                />
+              </div>
+              <div className="sm:col-span-2">
+                <label className="text-xs text-muted mb-1 block">Adresse expert adverse</label>
+                <input
+                  type="text"
+                  value={insuranceExpertAddress}
+                  onChange={e => setInsuranceExpertAddress(e.target.value)}
+                  placeholder="ex. 5 avenue du Marché, 34000 Montpellier"
+                  className="w-full px-3 py-2 text-sm border border-paper-2 rounded-sm focus:outline-none focus:border-primary bg-paper-2"
+                />
+              </div>
             </div>
           </div>
         </div>
