@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase'
-import TestimonialsCarousel from '@/components/ui/TestimonialsCarousel'
 
 type Session = {
   id: string
@@ -307,8 +306,6 @@ export default function FormationsPage() {
           </div>
         )}
       </div>
-
-      <TestimonialsCarousel />
 
       {/* Modal */}
       {selected && (
