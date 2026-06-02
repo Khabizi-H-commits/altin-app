@@ -9,6 +9,7 @@ import { buildStoragePath } from '@/lib/storage'
 import { useAuthStore } from '@/stores/authStore'
 import { fetchDossierByRef, fetchDossierSteps, fetchMessages, fetchActivity } from '@/stores/dossierStore'
 import { STEP_LABELS, type Dossier, type DossierStep, type Message, type Activity, type Document } from '@/types'
+import ExpertChecklistTab from './ExpertChecklistTab'
 
 export default function ExpertDossierPage() {
   const { ref } = useParams<{ ref: string }>()
@@ -20,7 +21,7 @@ export default function ExpertDossierPage() {
   const [documents, setDocuments] = useState<Document[]>([])
   const [loading, setLoading] = useState(true)
   const [validating, setValidating] = useState(false)
-  const [tab, setTab] = useState<'etapes' | 'documents' | 'messages' | 'activite'>('etapes')
+  const [tab, setTab] = useState<'etapes' | 'checklist' | 'documents' | 'messages' | 'activite'>('etapes')
   const [newMsg, setNewMsg] = useState('')
   const [sendingMsg, setSendingMsg] = useState(false)
   const [editingId, setEditingId] = useState<string | null>(null)
@@ -626,16 +627,17 @@ export default function ExpertDossierPage() {
 
         {/* Onglets */}
         <div className="bg-paper rounded-md border border-paper-2">
-          <div className="flex border-b border-paper-2">
-            {(['etapes', 'documents', 'messages', 'activite'] as const).map(t => (
+          <div className="flex border-b border-paper-2 overflow-x-auto">
+            {(['etapes', 'checklist', 'documents', 'messages', 'activite'] as const).map(t => (
               <button
                 key={t}
                 onClick={() => setTab(t)}
-                className={`px-5 py-3 text-sm font-medium transition-colors ${
+                className={`px-5 py-3 text-sm font-medium whitespace-nowrap transition-colors ${
                   tab === t ? 'text-primary border-b-2 border-primary' : 'text-muted hover:text-ink'
                 }`}
               >
                 {t === 'etapes' ? 'Notes'
+                  : t === 'checklist' ? '☑ Check-list terrain'
                   : t === 'documents' ? `Documents (${documents.length})`
                   : t === 'messages' ? `Messages (${messages.length})`
                   : 'Activité'}
@@ -644,6 +646,9 @@ export default function ExpertDossierPage() {
           </div>
 
           <div className="p-6">
+            {/* Check-list terrain */}
+            {tab === 'checklist' && <ExpertChecklistTab />}
+
             {/* Notes */}
             {tab === 'etapes' && (
               <div>
