@@ -33,6 +33,7 @@ export default function ExpertDossiersPage() {
   const { profile } = useAuthStore()
   const { dossiers, loading, fetchDossiers } = useDossierStore()
   const base = basePathForRole(profile?.role)
+  const isAdmin = profile?.role === 'admin'
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<DossierStatus | 'all'>('all')
   const [showCreate, setShowCreate] = useState(false)
@@ -43,7 +44,7 @@ export default function ExpertDossiersPage() {
   const [createError, setCreateError] = useState<string | null>(null)
 
   useEffect(() => {
-    if (profile?.id) fetchDossiers(profile.id)
+    if (profile?.id) fetchDossiers(profile.id, isAdmin)
   }, [profile?.id])
 
   const filtered = dossiers.filter(d => {
@@ -150,7 +151,7 @@ export default function ExpertDossiersPage() {
     setShowCreate(false)
     setEditingDossier(null)
     setForm(emptyForm)
-    fetchDossiers(profile!.id)
+    fetchDossiers(profile!.id, isAdmin)
   }
 
   const handleDelete = async (dossier: Dossier) => {
@@ -158,7 +159,7 @@ export default function ExpertDossiersPage() {
     setDeletingId(dossier.id)
     await supabase.from('dossiers').delete().eq('id', dossier.id)
     setDeletingId(null)
-    fetchDossiers(profile!.id)
+    fetchDossiers(profile!.id, isAdmin)
   }
 
   type Field = { key: keyof FormState; label: string; placeholder: string; disabled?: boolean; fullWidth?: boolean }
@@ -294,12 +295,17 @@ export default function ExpertDossiersPage() {
                 <Link to={`${base}/dossier/${dossier.ref}`} className="flex items-center gap-4 flex-1 min-w-0">
                   <StepRing currentStep={dossier.current_step} progress={dossier.progress} size="sm" />
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-0.5">
+                    <div className="flex items-center gap-2 mb-0.5 flex-wrap">
                       <span className="font-semibold text-sm text-ink">{dossier.ref}</span>
                       <Pill variant={dossier.status === 'active' ? 'success' : dossier.status === 'closed' ? 'muted' : 'warning'}>
                         {STATUS_LABELS[dossier.status]}
                       </Pill>
                       <Pill variant="primary">{dossier.type}</Pill>
+                      {isAdmin && dossier.owner && (
+                        <Pill variant={dossier.owner.role === 'partenaire' ? 'accent' : 'muted'}>
+                          {dossier.owner.role === 'partenaire' ? '🤝 ' : '👤 '}{dossier.owner.full_name ?? '—'}
+                        </Pill>
+                      )}
                     </div>
                     <p className="text-xs text-muted truncate">
                       {dossier.client_name ? `${dossier.client_name} · ` : ''}{dossier.address ?? '—'}

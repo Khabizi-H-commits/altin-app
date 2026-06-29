@@ -14,7 +14,7 @@ export default function ExpertDashboardPage() {
   const base = basePathForRole(profile?.role)
 
   useEffect(() => {
-    if (profile?.id) fetchDossiers(profile.id)
+    if (profile?.id) fetchDossiers(profile.id, profile.role === 'admin')
   }, [profile?.id])
 
   const actifs = dossiers.filter(d => d.status === 'active')
@@ -87,9 +87,14 @@ export default function ExpertDashboardPage() {
               >
                 <StepRing currentStep={dossier.current_step} progress={dossier.progress} size="sm" />
                 <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex items-center gap-2 mb-1 flex-wrap">
                     <span className="font-semibold text-ink text-sm">{dossier.ref}</span>
                     <Pill variant="primary">{dossier.type}</Pill>
+                    {profile?.role === 'admin' && dossier.owner && (
+                      <Pill variant={dossier.owner.role === 'partenaire' ? 'accent' : 'muted'}>
+                        {dossier.owner.role === 'partenaire' ? '🤝 ' : '👤 '}{dossier.owner.full_name ?? '—'}
+                      </Pill>
+                    )}
                   </div>
                   <p className="text-sm text-muted truncate">{dossier.address ?? 'Adresse non renseignée'}</p>
                 </div>

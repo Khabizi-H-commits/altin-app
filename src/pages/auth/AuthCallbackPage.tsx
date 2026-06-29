@@ -40,11 +40,7 @@ export default function AuthCallbackPage() {
         profile = created
       }
 
-      if (profile.role === 'admin') {
-        navigate('/admin')
-        return
-      }
-      if (profile.role === 'expert') {
+      if (profile.role === 'expert' || profile.role === 'admin') {
         navigate('/expert')
         return
       }

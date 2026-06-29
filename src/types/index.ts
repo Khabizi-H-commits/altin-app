@@ -44,6 +44,9 @@ export interface Dossier {
   insurance_expert_address: string | null
   opened_at: string
   closed_at: string | null
+  // Renseigné uniquement pour la vue admin (jointure sur expert_id) :
+  // qui est le professionnel propriétaire du dossier.
+  owner?: { full_name: string | null; role: Role } | null
 }
 
 export interface DossierStep {
