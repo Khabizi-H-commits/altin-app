@@ -7,6 +7,7 @@ import { StepRing } from '@/components/ui/StepRing'
 import { useDossierStore } from '@/stores/dossierStore'
 import { useAuthStore } from '@/stores/authStore'
 import { supabase } from '@/lib/supabase'
+import { basePathForRole } from '@/lib/space'
 import { STEP_LABELS, type DossierStatus, type Dossier } from '@/types'
 
 const STATUS_LABELS: Record<DossierStatus, string> = {
@@ -31,6 +32,7 @@ const emptyForm: FormState = {
 export default function ExpertDossiersPage() {
   const { profile } = useAuthStore()
   const { dossiers, loading, fetchDossiers } = useDossierStore()
+  const base = basePathForRole(profile?.role)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<DossierStatus | 'all'>('all')
   const [showCreate, setShowCreate] = useState(false)
@@ -289,7 +291,7 @@ export default function ExpertDossiersPage() {
           <div className="bg-paper rounded-md border border-paper-2 divide-y divide-paper-2">
             {filtered.map(dossier => (
               <div key={dossier.id} className="flex items-center gap-4 px-5 py-4 hover:bg-paper-2 transition-colors group">
-                <Link to={`/expert/dossier/${dossier.ref}`} className="flex items-center gap-4 flex-1 min-w-0">
+                <Link to={`${base}/dossier/${dossier.ref}`} className="flex items-center gap-4 flex-1 min-w-0">
                   <StepRing currentStep={dossier.current_step} progress={dossier.progress} size="sm" />
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-0.5">

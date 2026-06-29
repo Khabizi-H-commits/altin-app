@@ -7,6 +7,7 @@ import { StepRing } from '@/components/ui/StepRing'
 import { supabase } from '@/lib/supabase'
 import { buildStoragePath } from '@/lib/storage'
 import { useAuthStore } from '@/stores/authStore'
+import { basePathForRole } from '@/lib/space'
 import { fetchDossierByRef, fetchDossierSteps, fetchMessages, fetchActivity } from '@/stores/dossierStore'
 import { STEP_LABELS, type Dossier, type DossierStep, type Message, type Activity, type Document } from '@/types'
 import ExpertChecklistTab from './ExpertChecklistTab'
@@ -14,6 +15,7 @@ import ExpertChecklistTab from './ExpertChecklistTab'
 export default function ExpertDossierPage() {
   const { ref } = useParams<{ ref: string }>()
   const { profile } = useAuthStore()
+  const base = basePathForRole(profile?.role)
   const [dossier, setDossier] = useState<Dossier | null>(null)
   const [steps, setSteps] = useState<DossierStep[]>([])
   const [messages, setMessages] = useState<(Message & { profiles: { full_name: string; initials: string; role: string } })[]>([])
@@ -325,7 +327,7 @@ export default function ExpertDossierPage() {
         <ExpertNav />
         <div className="max-w-5xl mx-auto px-6 py-12 text-center">
           <p className="text-muted">Dossier introuvable</p>
-          <Link to="/expert/dossiers" className="mt-4 inline-block text-primary hover:underline text-sm">← Retour</Link>
+          <Link to={`${base}/dossiers`} className="mt-4 inline-block text-primary hover:underline text-sm">← Retour</Link>
         </div>
       </div>
     )
@@ -338,7 +340,7 @@ export default function ExpertDossierPage() {
 
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-muted mb-6">
-          <Link to="/expert/dossiers" className="hover:text-ink">Dossiers</Link>
+          <Link to={`${base}/dossiers`} className="hover:text-ink">Dossiers</Link>
           <span>/</span>
           <span className="text-ink font-medium">{dossier.ref}</span>
         </div>
@@ -395,7 +397,7 @@ export default function ExpertDossierPage() {
               </div>
             </div>
             <div className="flex gap-2">
-              <Link to={`/expert/dossier/${dossier.ref}/rapport`}>
+              <Link to={`${base}/dossier/${dossier.ref}/rapport`}>
                 <Button variant="ghost" size="sm">Rapport</Button>
               </Link>
             </div>

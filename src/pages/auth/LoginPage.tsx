@@ -4,8 +4,15 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
 import { supabase } from '@/lib/supabase'
+import { basePathForRole } from '@/lib/space'
 
-type Mode = 'client' | 'expert'
+type Mode = 'client' | 'expert' | 'partenaire'
+
+const MODE_LABELS: Record<Mode, string> = {
+  client: 'Espace client',
+  expert: 'Espace expert',
+  partenaire: 'Espace partenaire',
+}
 
 const clientSchema = z.object({
   email: z.string().email('Email invalide'),
@@ -44,10 +51,17 @@ export default function LoginPage() {
   const handleExpertSubmit = async ({ email, password }: ExpertForm) => {
     setLoading(true)
     setError(null)
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password })
+    if (error || !data.user) {
+      setLoading(false)
+      return setError('Email ou mot de passe incorrect')
+    }
+    // Aiguillage selon le rôle réel du compte (et non l'onglet choisi).
+    const { data: profile } = await supabase
+      .from('profiles').select('role').eq('id', data.user.id).single()
     setLoading(false)
-    if (error) return setError('Email ou mot de passe incorrect')
-    navigate('/expert')
+    if (profile?.role === 'admin') return navigate('/admin')
+    navigate(basePathForRole(profile?.role))
   }
 
   return (
@@ -65,17 +79,17 @@ export default function LoginPage() {
 
         {/* Mode switcher */}
         <div className="flex bg-paper-2 rounded-md p-1 mb-6 border border-paper-2">
-          {(['client', 'expert'] as Mode[]).map((m) => (
+          {(['client', 'expert', 'partenaire'] as Mode[]).map((m) => (
             <button
               key={m}
               onClick={() => { setMode(m); setError(null); setSent(false) }}
-              className={`flex-1 py-2 rounded-sm text-sm font-medium transition-all ${
+              className={`flex-1 py-2 px-1 rounded-sm text-xs sm:text-sm font-medium transition-all ${
                 mode === m
                   ? 'bg-paper text-ink shadow-sm'
                   : 'text-muted hover:text-ink'
               }`}
             >
-              {m === 'client' ? 'Espace client' : 'Espace expert'}
+              {MODE_LABELS[m]}
             </button>
           ))}
         </div>
@@ -124,8 +138,8 @@ export default function LoginPage() {
             </>
           )}
 
-          {/* Expert — email + password */}
-          {mode === 'expert' && (
+          {/* Expert / Partenaire — email + password */}
+          {(mode === 'expert' || mode === 'partenaire') && (
             <form onSubmit={expertForm.handleSubmit(handleExpertSubmit)} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-ink mb-1">Email</label>

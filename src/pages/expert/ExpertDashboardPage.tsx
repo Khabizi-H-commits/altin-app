@@ -5,11 +5,13 @@ import { StepRing } from '@/components/ui/StepRing'
 import { Pill } from '@/components/ui/Pill'
 import { useDossierStore } from '@/stores/dossierStore'
 import { useAuthStore } from '@/stores/authStore'
+import { basePathForRole } from '@/lib/space'
 import { STEP_LABELS } from '@/types'
 
 export default function ExpertDashboardPage() {
   const { profile } = useAuthStore()
   const { dossiers, loading, fetchDossiers } = useDossierStore()
+  const base = basePathForRole(profile?.role)
 
   useEffect(() => {
     if (profile?.id) fetchDossiers(profile.id)
@@ -48,7 +50,7 @@ export default function ExpertDashboardPage() {
         {/* Dossiers actifs */}
         <div className="mb-6 flex items-center justify-between">
           <h2 className="text-base font-semibold text-ink">Dossiers actifs</h2>
-          <Link to="/expert/dossiers" className="text-sm text-primary hover:underline">
+          <Link to={`${base}/dossiers`} className="text-sm text-primary hover:underline">
             Voir tous →
           </Link>
         </div>
@@ -67,7 +69,7 @@ export default function ExpertDashboardPage() {
               Créez votre premier dossier client dans la section Dossiers.
             </p>
             <Link
-              to="/expert/dossiers"
+              to={`${base}/dossiers`}
               className="mt-4 inline-block bg-primary text-white text-sm font-semibold px-4 py-2 rounded-sm hover:opacity-90 transition-opacity"
             >
               Gérer les dossiers
@@ -80,7 +82,7 @@ export default function ExpertDashboardPage() {
             {actifs.map(dossier => (
               <Link
                 key={dossier.id}
-                to={`/expert/dossier/${dossier.ref}`}
+                to={`${base}/dossier/${dossier.ref}`}
                 className="bg-paper rounded-md border border-paper-2 p-5 flex items-center gap-5 hover:border-primary/30 hover:shadow-sm transition-all"
               >
                 <StepRing currentStep={dossier.current_step} progress={dossier.progress} size="sm" />
