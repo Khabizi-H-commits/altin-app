@@ -60,7 +60,7 @@ export default function LoginPage() {
     const { data: profile } = await supabase
       .from('profiles').select('role').eq('id', data.user.id).single()
     setLoading(false)
-    if (profile?.role === 'admin') return navigate('/admin')
+    // L'admin utilise l'Espace expert (où il voit/édite tous les dossiers).
     navigate(basePathForRole(profile?.role))
   }
 

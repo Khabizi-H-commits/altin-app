@@ -5,7 +5,7 @@ import type { Dossier, DossierStep, Message, Activity } from '@/types'
 interface DossierState {
   dossiers: Dossier[]
   loading: boolean
-  fetchDossiers: (expertId: string) => Promise<void>
+  fetchDossiers: (expertId: string, isAdmin?: boolean) => Promise<void>
   validateStep: (dossierId: string, stepNum: number) => Promise<void>
 }
 
@@ -13,14 +13,16 @@ export const useDossierStore = create<DossierState>((set, get) => ({
   dossiers: [],
   loading: false,
 
-  fetchDossiers: async (expertId) => {
+  // isAdmin = true => récupère TOUS les dossiers (de tous les pros), avec le
+  // propriétaire (owner) pour pouvoir l'afficher. Sinon, uniquement les siens.
+  fetchDossiers: async (expertId, isAdmin = false) => {
     set({ loading: true })
-    const { data } = await supabase
+    let query = supabase
       .from('dossiers')
-      .select('*')
-      .eq('expert_id', expertId)
-      .order('opened_at', { ascending: false })
-    set({ dossiers: data ?? [], loading: false })
+      .select('*, owner:profiles!expert_id(full_name, role)')
+    if (!isAdmin) query = query.eq('expert_id', expertId)
+    const { data } = await query.order('opened_at', { ascending: false })
+    set({ dossiers: (data as Dossier[]) ?? [], loading: false })
   },
 
   validateStep: async (dossierId, stepNum) => {

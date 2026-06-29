@@ -13,7 +13,6 @@ import ExpertRapportPage from './pages/expert/ExpertRapportPage'
 import ExpertDossiersPage from './pages/expert/ExpertDossiersPage'
 import ExpertAgendaPage from './pages/expert/ExpertAgendaPage'
 import ExpertFormationsPage from './pages/expert/ExpertFormationsPage'
-import AdminDashboardPage from './pages/admin/AdminDashboardPage'
 import FormationsPage from './pages/public/FormationsPage'
 
 export default function App() {
@@ -51,11 +50,6 @@ export default function App() {
         <Route path="/partenaire/dossiers" element={<ExpertDossiersPage />} />
         <Route path="/partenaire/dossier/:ref" element={<ExpertDossierPage />} />
         <Route path="/partenaire/dossier/:ref/rapport" element={<ExpertRapportPage />} />
-      </Route>
-
-      {/* Cockpit Admin — protégé (vue globale) */}
-      <Route element={<AppShell requiredRole="admin" />}>
-        <Route path="/admin" element={<AdminDashboardPage />} />
       </Route>
 
       {/* Défaut */}

@@ -12,7 +12,7 @@ export default function ExpertAgendaPage() {
   const [selectedDate, setSelectedDate] = useState<string>(new Date().toISOString().split('T')[0])
 
   useEffect(() => {
-    if (profile?.id) fetchDossiers(profile.id)
+    if (profile?.id) fetchDossiers(profile.id, profile.role === 'admin')
   }, [profile?.id])
 
   // Générer les 7 prochains jours
