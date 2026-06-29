@@ -170,7 +170,11 @@ export default function AdminDashboardPage() {
               </thead>
               <tbody>
                 {filtered.map(d => (
-                  <tr key={d.id} className="border-t border-paper-2 hover:bg-paper-2/50 transition-colors">
+                  <tr
+                    key={d.id}
+                    onClick={() => navigate(`/expert/dossier/${d.ref}`)}
+                    className="border-t border-paper-2 hover:bg-paper-2/50 transition-colors cursor-pointer"
+                  >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-ink">{d.owner?.full_name ?? '—'}</span>
@@ -179,7 +183,7 @@ export default function AdminDashboardPage() {
                         </Pill>
                       </div>
                     </td>
-                    <td className="px-4 py-3 font-medium text-ink">{d.ref}</td>
+                    <td className="px-4 py-3 font-medium text-primary underline-offset-2 hover:underline">{d.ref}</td>
                     <td className="px-4 py-3 text-muted">{d.type}</td>
                     <td className="px-4 py-3 text-muted truncate max-w-[200px]">{d.address ?? '—'}</td>
                     <td className="px-4 py-3">{STATUS_LABEL[d.status] ?? d.status}</td>
