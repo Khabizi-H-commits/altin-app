@@ -3,6 +3,8 @@ import { AppShell } from './components/layout/AppShell'
 import LoginPage from './pages/auth/LoginPage'
 import AuthCallbackPage from './pages/auth/AuthCallbackPage'
 import ForgotPasswordPage from './pages/auth/ForgotPasswordPage'
+import PendingPage from './pages/auth/PendingPage'
+import AdminPartenairesPage from './pages/admin/AdminPartenairesPage'
 import ClientDossierPage from './pages/client/ClientDossierPage'
 import ClientDocumentsPage from './pages/client/ClientDocumentsPage'
 import ClientMessagesPage from './pages/client/ClientMessagesPage'
@@ -23,6 +25,7 @@ export default function App() {
       <Route path="/formations" element={<FormationsPage />} />
       <Route path="/auth/callback" element={<AuthCallbackPage />} />
       <Route path="/auth/forgot-password" element={<ForgotPasswordPage />} />
+      <Route path="/attente" element={<PendingPage />} />
 
       {/* Espace Client — protégé */}
       <Route element={<AppShell requiredRole="client" />}>
@@ -50,6 +53,11 @@ export default function App() {
         <Route path="/partenaire/dossiers" element={<ExpertDossiersPage />} />
         <Route path="/partenaire/dossier/:ref" element={<ExpertDossierPage />} />
         <Route path="/partenaire/dossier/:ref/rapport" element={<ExpertRapportPage />} />
+      </Route>
+
+      {/* Admin — gestion des partenaires (validation des inscriptions) */}
+      <Route element={<AppShell requiredRole="admin" />}>
+        <Route path="/admin/partenaires" element={<AdminPartenairesPage />} />
       </Route>
 
       {/* Défaut */}

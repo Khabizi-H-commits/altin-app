@@ -7,6 +7,7 @@ export function ExpertNav() {
   const navigate = useNavigate()
 
   const isPartenaire = profile?.role === 'partenaire'
+  const isAdmin = profile?.role === 'admin'
   const base = basePathForRole(profile?.role)
 
   const handleSignOut = async () => {
@@ -38,6 +39,7 @@ export function ExpertNav() {
         <NavLink to={`${base}/dossiers`} className={linkClass}>Dossiers</NavLink>
         {!isPartenaire && <NavLink to={`${base}/agenda`} className={linkClass}>Agenda</NavLink>}
         {!isPartenaire && <NavLink to={`${base}/formations`} className={linkClass}>Formations</NavLink>}
+        {isAdmin && <NavLink to="/admin/partenaires" className={linkClass}>Partenaires</NavLink>}
       </div>
       <div className="flex items-center gap-4">
         <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
