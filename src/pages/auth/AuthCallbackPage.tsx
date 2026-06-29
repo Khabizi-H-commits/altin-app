@@ -48,6 +48,10 @@ export default function AuthCallbackPage() {
         navigate('/partenaire')
         return
       }
+      if (profile.role === 'pending') {
+        navigate('/attente')
+        return
+      }
 
       // Cherche le dossier par client_id ou par email (première connexion)
       let { data: dossier } = await supabase
