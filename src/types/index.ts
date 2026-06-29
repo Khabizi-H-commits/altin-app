@@ -1,4 +1,4 @@
-export type Role = 'expert' | 'client' | 'admin'
+export type Role = 'expert' | 'client' | 'admin' | 'partenaire'
 export type StepStatus = 'pending' | 'in_progress' | 'done'
 export type DossierStatus = 'active' | 'closed' | 'pending'
 export type ActivityType = 'step_validated' | 'message_sent' | 'document_uploaded' | 'dossier_opened'

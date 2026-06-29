@@ -6,6 +6,7 @@ import { fetchDossierByRef } from '@/stores/dossierStore'
 import { supabase } from '@/lib/supabase'
 import { buildStoragePath } from '@/lib/storage'
 import { useAuthStore } from '@/stores/authStore'
+import { basePathForRole } from '@/lib/space'
 import type { Document, Dossier } from '@/types'
 
 const formatBytes = (n: number | null) => {
@@ -19,6 +20,7 @@ export default function ExpertRapportPage() {
   const { ref } = useParams<{ ref: string }>()
   const navigate = useNavigate()
   const { profile } = useAuthStore()
+  const base = basePathForRole(profile?.role)
   const [dossier, setDossier] = useState<Dossier | null>(null)
   const [rapport, setRapport] = useState<Document | null>(null)
   const [loading, setLoading] = useState(true)
@@ -127,7 +129,7 @@ export default function ExpertRapportPage() {
       .update({ current_step: 6, progress: 5 / 6 })
       .eq('id', dossier.id)
     setFinalizing(false)
-    navigate(`/expert/dossier/${ref}`)
+    navigate(`${base}/dossier/${ref}`)
   }
 
   return (
@@ -137,9 +139,9 @@ export default function ExpertRapportPage() {
 
         {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm text-muted mb-6">
-          <Link to="/expert/dossiers" className="hover:text-ink">Dossiers</Link>
+          <Link to={`${base}/dossiers`} className="hover:text-ink">Dossiers</Link>
           <span>/</span>
-          <Link to={`/expert/dossier/${ref}`} className="hover:text-ink">{ref}</Link>
+          <Link to={`${base}/dossier/${ref}`} className="hover:text-ink">{ref}</Link>
           <span>/</span>
           <span className="text-ink font-medium">Rapport</span>
         </div>

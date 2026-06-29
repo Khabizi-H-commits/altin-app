@@ -1,9 +1,13 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
+import { basePathForRole } from '@/lib/space'
 
 export function ExpertNav() {
   const { profile, signOut } = useAuthStore()
   const navigate = useNavigate()
+
+  const isPartenaire = profile?.role === 'partenaire'
+  const base = basePathForRole(profile?.role)
 
   const handleSignOut = async () => {
     await signOut()
@@ -24,11 +28,16 @@ export function ExpertNav() {
           <span className="font-bold text-lg text-primary tracking-tight">
             ALT'IN<span className="text-accent">.</span>
           </span>
+          {isPartenaire && (
+            <span className="ml-1 text-[11px] font-semibold uppercase tracking-wide text-accent bg-accent/10 px-2 py-0.5 rounded-full">
+              Partenaire
+            </span>
+          )}
         </div>
-        <NavLink to="/expert" end className={linkClass}>Aujourd'hui</NavLink>
-        <NavLink to="/expert/dossiers" className={linkClass}>Dossiers</NavLink>
-        <NavLink to="/expert/agenda" className={linkClass}>Agenda</NavLink>
-        <NavLink to="/expert/formations" className={linkClass}>Formations</NavLink>
+        <NavLink to={base} end className={linkClass}>Aujourd'hui</NavLink>
+        <NavLink to={`${base}/dossiers`} className={linkClass}>Dossiers</NavLink>
+        {!isPartenaire && <NavLink to={`${base}/agenda`} className={linkClass}>Agenda</NavLink>}
+        {!isPartenaire && <NavLink to={`${base}/formations`} className={linkClass}>Formations</NavLink>}
       </div>
       <div className="flex items-center gap-4">
         <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
