@@ -265,6 +265,17 @@ export default function LoginPage() {
             </p>
           )}
         </div>
+
+        {/* Retour au site vitrine */}
+        <p className="text-center mt-6">
+          <a
+            href="https://altin-expertises.fr"
+            className="inline-flex items-center gap-1.5 text-xs text-muted hover:text-ink transition-colors"
+          >
+            <span aria-hidden="true">←</span>
+            Retour au site ALT'IN Expertises
+          </a>
+        </p>
       </div>
     </div>
   )
