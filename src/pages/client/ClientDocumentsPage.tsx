@@ -4,6 +4,7 @@ import { ClientNav } from '@/components/layout/ClientNav'
 import { useAuthStore } from '@/stores/authStore'
 import { supabase } from '@/lib/supabase'
 import { buildStoragePath } from '@/lib/storage'
+import { compresserPhoto } from '@/lib/images'
 import type { Document } from '@/types'
 
 export default function ClientDocumentsPage() {
@@ -35,7 +36,8 @@ export default function ClientDocumentsPage() {
     if (!files || !dossierId || !profile) return
     setUploading(true)
     setUploadError(null)
-    for (const file of Array.from(files)) {
+    for (const original of Array.from(files)) {
+      const file = await compresserPhoto(original)
       const path = buildStoragePath(dossierId, file)
       const { error: se } = await supabase.storage.from('Document').upload(path, file)
       if (se) { setUploadError(`Erreur : ${se.message}`); setUploading(false); return }
