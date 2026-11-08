@@ -6,6 +6,7 @@ import { Pill } from '@/components/ui/Pill'
 import { StepRing } from '@/components/ui/StepRing'
 import { supabase } from '@/lib/supabase'
 import { buildStoragePath } from '@/lib/storage'
+import { compresserPhoto } from '@/lib/images'
 import { useAuthStore } from '@/stores/authStore'
 import { basePathForRole } from '@/lib/space'
 import { fetchDossierByRef, fetchDossierSteps, fetchMessages, fetchActivity } from '@/stores/dossierStore'
@@ -143,7 +144,8 @@ export default function ExpertDossierPage() {
     if (!files || !dossier || !profile) return
     setUploading(true)
     setUploadError(null)
-    for (const file of Array.from(files)) {
+    for (const original of Array.from(files)) {
+      const file = await compresserPhoto(original)
       const path = buildStoragePath(dossier.id, file)
       const { error: storageError } = await supabase.storage
         .from('Document')
