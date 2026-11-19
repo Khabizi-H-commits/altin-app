@@ -6,7 +6,7 @@ import { supabase } from '@/lib/supabase'
 import { STEP_LABELS, type Dossier, type DossierStep, type Activity } from '@/types'
 
 const STEP_DESC: Record<number, string> = {
-  1: 'Votre demande a été reçue. Notre expert vous contactera sous 48h.',
+  1: 'Bienvenue dans votre espace client. Vous pouvez échanger avec votre expert directement sur cette application.',
   2: 'L\'expert se déplace sur place pour constater les dégâts.',
   3: 'Analyse approfondie et chiffrage des dommages en cours.',
   4: 'Votre dossier est en cours de finalisation.',
