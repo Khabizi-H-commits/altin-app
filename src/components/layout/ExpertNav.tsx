@@ -1,6 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '@/stores/authStore'
 import { basePathForRole } from '@/lib/space'
+import { DossierSearchBar } from './DossierSearchBar'
 
 export function ExpertNav() {
   const { profile, signOut } = useAuthStore()
@@ -42,6 +43,7 @@ export function ExpertNav() {
         {isAdmin && <NavLink to="/admin/partenaires" className={linkClass}>Partenaires</NavLink>}
       </div>
       <div className="flex items-center gap-4">
+        <DossierSearchBar />
         <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-xs font-bold">
           {profile?.initials ?? 'HK'}
         </div>

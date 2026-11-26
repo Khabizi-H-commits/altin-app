@@ -8,6 +8,7 @@ import { useDossierStore } from '@/stores/dossierStore'
 import { useAuthStore } from '@/stores/authStore'
 import { supabase } from '@/lib/supabase'
 import { basePathForRole } from '@/lib/space'
+import { searchDossiers } from '@/lib/dossierSearch'
 import { STEP_LABELS, type DossierStatus, type Dossier } from '@/types'
 
 const STATUS_LABELS: Record<DossierStatus, string> = {
@@ -47,14 +48,9 @@ export default function ExpertDossiersPage() {
     if (profile?.id) fetchDossiers(profile.id, isAdmin)
   }, [profile?.id])
 
-  const filtered = dossiers.filter(d => {
-    const matchSearch = d.ref.toLowerCase().includes(search.toLowerCase()) ||
-      d.type.toLowerCase().includes(search.toLowerCase()) ||
-      (d.address ?? '').toLowerCase().includes(search.toLowerCase()) ||
-      (d.client_name ?? '').toLowerCase().includes(search.toLowerCase())
-    const matchFilter = filter === 'all' || d.status === filter
-    return matchSearch && matchFilter
-  })
+  const filtered = searchDossiers(dossiers, search).filter(
+    d => filter === 'all' || d.status === filter,
+  )
 
   const openCreate = () => {
     setEditingDossier(null)
