@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ExpertNav } from '@/components/layout/ExpertNav'
 import { StepRing } from '@/components/ui/StepRing'
@@ -12,12 +12,19 @@ export default function ExpertDashboardPage() {
   const { profile } = useAuthStore()
   const { dossiers, loading, fetchDossiers } = useDossierStore()
   const base = basePathForRole(profile?.role)
+  const [search, setSearch] = useState('')
 
   useEffect(() => {
     if (profile?.id) fetchDossiers(profile.id, profile.role === 'admin')
   }, [profile?.id])
 
   const actifs = dossiers.filter(d => d.status === 'active')
+  const q = search.trim().toLowerCase()
+  // Avec une recherche : tous les dossiers (actifs, en attente, clôturés)
+  const liste = q
+    ? dossiers.filter(d => [d.ref, d.type, d.address, d.client_name, d.insurer_claim_number]
+        .some(v => (v ?? '').toLowerCase().includes(q)))
+    : actifs
   const today = new Date().toLocaleDateString('fr-FR', { weekday: 'long', day: 'numeric', month: 'long' })
 
   return (
@@ -47,9 +54,22 @@ export default function ExpertDashboardPage() {
           ))}
         </div>
 
+        {/* Recherche */}
+        <label htmlFor="recherche-dossier" className="sr-only">Rechercher un dossier</label>
+        <input
+          id="recherche-dossier"
+          type="search"
+          value={search}
+          onChange={e => setSearch(e.target.value)}
+          placeholder="🔍 Rechercher un dossier : réf., client, adresse, type, n° de sinistre…"
+          className="w-full mb-6 px-4 py-2.5 rounded-sm border border-paper-2 bg-paper text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary"
+        />
+
         {/* Dossiers actifs */}
         <div className="mb-6 flex items-center justify-between">
-          <h2 className="text-base font-semibold text-ink">Dossiers actifs</h2>
+          <h2 className="text-base font-semibold text-ink">
+            {q ? `Résultats (${liste.length})` : 'Dossiers actifs'}
+          </h2>
           <Link to={`${base}/dossiers`} className="text-sm text-primary hover:underline">
             Voir tous →
           </Link>
@@ -61,7 +81,13 @@ export default function ExpertDashboardPage() {
           </div>
         )}
 
-        {!loading && actifs.length === 0 && (
+        {!loading && q && liste.length === 0 && (
+          <div className="bg-paper rounded-md border border-paper-2 p-10 text-center">
+            <p className="text-sm text-muted">Aucun dossier ne correspond à « {search.trim()} »</p>
+          </div>
+        )}
+
+        {!loading && !q && actifs.length === 0 && (
           <div className="bg-paper rounded-md border border-paper-2 p-12 text-center">
             <p className="text-3xl mb-3">📂</p>
             <p className="font-semibold text-ink">Aucun dossier actif</p>
@@ -77,9 +103,9 @@ export default function ExpertDashboardPage() {
           </div>
         )}
 
-        {!loading && actifs.length > 0 && (
+        {!loading && liste.length > 0 && (
           <div className="grid gap-3">
-            {actifs.map(dossier => (
+            {liste.map(dossier => (
               <Link
                 key={dossier.id}
                 to={`${base}/dossier/${dossier.ref}`}
